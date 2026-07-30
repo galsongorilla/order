@@ -62,20 +62,6 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
-  <!-- セキュリティロック (PIN認証) モーダル -->
-  <div id="authOverlay" class="modal-overlay">
-    <div class="bg-white p-6 rounded-2xl w-80 text-center shadow-2xl flex flex-col items-center gap-4">
-      <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center text-pink-500 mb-1">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-      </div>
-      <h2 class="text-xl font-bold text-gray-800">店舗ロック</h2>
-      <p class="text-xs text-gray-500">パスワードを入力してください</p>
-      <input type="password" id="authPinInput" class="w-full text-center text-2xl font-bold p-3 border-2 border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none tracking-widest" placeholder="••••">
-      <p id="authErrorMsg" class="text-xs text-red-500 font-bold hidden">パスワードが違います</p>
-      <button onclick="verifyPin()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl shadow-md active:bg-pink-600">ロック解除</button>
-    </div>
-  </div>
-
   <!-- STEP 1: ログイン画面 -->
   <div id="loginScreen" class="flex-1 p-6 flex flex-col gap-6 overflow-y-auto">
     <header class="pt-4 pb-2">
@@ -89,10 +75,8 @@
         </div>
         <div>
           <label class="block text-lg font-bold text-gray-700 mb-2">入力者</label>
-          <input type="text" id="loginStaff" list="staffList" class="w-full p-3 rounded-lg border-2 border-gray-300 text-lg bg-white focus:outline-none focus:border-pink-400" placeholder="名前を入力">
-      
+          <input type="text" id="loginStaff" class="w-full p-3 rounded-lg border-2 border-gray-300 text-lg bg-white focus:outline-none focus:border-pink-400" placeholder="名前を入力">
         </div>
-    
       </div>
     </div>
     <div class="mt-4 pb-8">
@@ -231,24 +215,6 @@
     // ※ GASのSECRET_API_KEYと同じ合い言葉を設定
     const API_KEY = "umi2026"; 
 
-    // セキュリティ認証処理
-    function verifyPin() {
-      const pin = document.getElementById('authPinInput').value.trim();
-      if (pin === API_KEY) {
-        localStorage.setItem('handy_authenticated', 'true');
-        document.getElementById('authOverlay').classList.add('hidden');
-        document.getElementById('authErrorMsg').classList.add('hidden');
-        fetchMenu();
-      } else {
-        document.getElementById('authErrorMsg').classList.remove('hidden');
-      }
-    }
-
-    // 起動時の自動認証確認
-    if (localStorage.getItem('handy_authenticated') === 'true') {
-      document.getElementById('authOverlay').classList.add('hidden');
-    }
-
     const tables = [
       { id: "C1", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
       { id: "C2", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
@@ -295,7 +261,9 @@
         btn.innerText = "次へ";
       }
     }
-    if (localStorage.getItem('handy_authenticated') === 'true') { fetchMenu(); }
+    
+    // 起動時にメニュー取得を実行
+    fetchMenu();
 
     setInterval(() => {
       if (!document.getElementById('tableScreen').classList.contains('hidden')) { renderTables(); }
@@ -313,9 +281,9 @@
     }
 
     function logout() {
-      if(confirm("ログアウトしてロックしますか？")) {
-        localStorage.removeItem('handy_authenticated');
-        location.reload();
+      if(confirm("ログイン画面に戻りますか？")) {
+        document.getElementById('tableScreen').classList.add('hidden');
+        document.getElementById('loginScreen').classList.remove('hidden');
       }
     }
 
