@@ -90,16 +90,9 @@
         <div>
           <label class="block text-lg font-bold text-gray-700 mb-2">入力者</label>
           <input type="text" id="loginStaff" list="staffList" class="w-full p-3 rounded-lg border-2 border-gray-300 text-lg bg-white focus:outline-none focus:border-pink-400" placeholder="名前を入力">
-          <datalist id="staffList">
-            <option value="たなか"></option>
-            <option value="やまだ"></option>
-            <option value="すずき"></option>
-          </datalist>
+      
         </div>
-        <div>
-          <label class="block text-lg font-bold text-gray-700 mb-2">今日の意気込み</label>
-          <input type="text" id="loginMessage" class="w-full p-3 rounded-lg border-2 border-gray-300 text-lg bg-white focus:outline-none focus:border-pink-400" placeholder="頑張ります！">
-        </div>
+    
       </div>
     </div>
     <div class="mt-4 pb-8">
@@ -144,8 +137,8 @@
           </div>
         </div>
         <div class="flex gap-4 mt-4">
-          <div class="input-group flex-1"><label>男性 (人)</label><input type="number" id="custMale" value="0" min="0" inputmode="numeric"></div>
-          <div class="input-group flex-1"><label>女性 (人)</label><input type="number" id="custFemale" value="0" min="0" inputmode="numeric"></div>
+          <div class="input-group flex-1"><label>男性 (人)</label><input type="number" id="custMale" placeholder="0" min="0" inputmode="numeric"></div>
+          <div class="input-group flex-1"><label>女性 (人)</label><input type="number" id="custFemale" placeholder="0" min="0" inputmode="numeric"></div>
         </div>
       </div>
       <button onclick="startNewOrder()" class="w-full py-4 mt-4 bg-pink-500 text-white text-xl font-bold rounded-xl shadow-md active:bg-pink-600 transition-colors">注文を開始する</button>
@@ -398,8 +391,8 @@
         document.getElementById('tableScreen').classList.add('hidden');
         document.getElementById('customerInfoTable').innerText = selectedTable.id;
         document.querySelectorAll('.cust-age-cb').forEach(cb => cb.checked = false);
-        document.getElementById('custMale').value = 0;
-        document.getElementById('custFemale').value = 0;
+        document.getElementById('custMale').value = "";
+        document.getElementById('custFemale').value = "";
         document.getElementById('customerInfoScreen').classList.remove('hidden');
       } else if (action === 'add') {
         orderType = '追加';
@@ -438,8 +431,8 @@
         tbl.history = [];
         tbl.customerInfo = {
           age: Array.from(document.querySelectorAll('.cust-age-cb:checked')).map(cb => cb.value),
-          male: document.getElementById('custMale').value,
-          female: document.getElementById('custFemale').value
+          male: document.getElementById('custMale').value || 0,
+          female: document.getElementById('custFemale').value || 0
         };
       }
       document.getElementById('orderHeaderTitle').innerText = `${selectedTable.id} (新規)`;
