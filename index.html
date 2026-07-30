@@ -13,8 +13,6 @@
       user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
-    
-    /* テーブル画面用 */
     .table-card {
       aspect-ratio: 1 / 1;
       border-radius: 16px;
@@ -27,62 +25,56 @@
       border: 3px solid #ec4899; 
       box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
     }
-    .table-card:active {
-      transform: scale(0.95);
-    }
-    
-    /* 注文画面用 */
+    .table-card:active { transform: scale(0.95); }
     .step-box { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 12px; }
     .step-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 10px; }
     .step-title { font-weight: bold; font-size: 14px; color: #666; }
-    
     .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .btn-cat { padding: 12px 8px; background: #f1f3f5; border: 1px solid #dee2e6; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; }
     .btn-cat:active { background: #e9ecef; }
-
     .item-list { display: flex; flex-direction: column; gap: 8px; }
     .item-card { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #e9ecef; padding: 10px; border-radius: 8px; }
     .item-card.has-count { background: #e6fcf5; border-color: #63e6be; }
     .item-info { flex: 1; font-weight: bold; font-size: 14px; }
     .item-price { font-size: 12px; color: #666; font-weight: normal; margin-top: 2px; }
-
     .count-controls { display: flex; align-items: center; gap: 8px; }
     .btn-cnt { width: 36px; height: 36px; font-size: 20px; font-weight: bold; border-radius: 6px; border: 1px solid #ccc; background: #f1f3f5; cursor: pointer; }
     .btn-cnt:active { background: #e2e8f0; }
     .cnt-val { font-size: 18px; font-weight: bold; min-width: 20px; text-align: center; }
-
     .input-group { margin-bottom: 12px; }
     .input-group label { display: block; font-size: 13px; color: #666; margin-bottom: 4px; }
     .input-group input, .input-group select { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; }
-
     .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 12px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; gap: 10px; z-index: 40; }
-    
     .btn-clear { width: 30%; padding: 14px; background: #ffec99; color: #f59f00; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; }
     .btn-confirm { width: 70%; padding: 14px; background: #228be6; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
     .btn-confirm:disabled { background: #ccc; }
     .btn-secondary { width: 100%; padding: 10px; background: transparent; color: #868e96; border: none; font-size: 14px; margin-top: 8px; cursor: pointer; }
     .btn-custom { width: 100%; padding: 10px; background: #e7f5ff; border: 1px dashed #74c0fc; color: #1971c2; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 8px; }
-
-    /* モーダル用 */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex; justify-content: center; align-items: center;
-      z-index: 50; padding: 20px;
-    }
-    .modal-content { background: white; border-radius: 12px; padding: 20px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 100; padding: 20px; }
+    .modal-content { background: white; border-radius: 16px; padding: 20px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
     .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; border-bottom: 2px solid #eee; padding-bottom: 8px; }
     .modal-item-card { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #eee; }
     .modal-item-info { flex: 1; font-size: 14px; font-weight: bold; }
-
-    /* 決済ボタン */
     .payment-btn { padding: 16px; border-radius: 12px; border: 2px solid #ddd; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
     .payment-btn.selected { border-color: #3b82f6; background-color: #eff6ff; color: #1d4ed8; }
-
     .hidden { display: none !important; }
   </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
+
+  <!-- セキュリティロック (PIN認証) モーダル -->
+  <div id="authOverlay" class="modal-overlay">
+    <div class="bg-white p-6 rounded-2xl w-80 text-center shadow-2xl flex flex-col items-center gap-4">
+      <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center text-pink-500 mb-1">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </div>
+      <h2 class="text-xl font-bold text-gray-800">店舗ロック</h2>
+      <p class="text-xs text-gray-500">パスワードを入力してください</p>
+      <input type="password" id="authPinInput" class="w-full text-center text-2xl font-bold p-3 border-2 border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none tracking-widest" placeholder="••••">
+      <p id="authErrorMsg" class="text-xs text-red-500 font-bold hidden">パスワードが違います</p>
+      <button onclick="verifyPin()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl shadow-md active:bg-pink-600">ロック解除</button>
+    </div>
+  </div>
 
   <!-- STEP 1: ログイン画面 -->
   <div id="loginScreen" class="flex-1 p-6 flex flex-col gap-6 overflow-y-auto">
@@ -134,9 +126,7 @@
   <div id="customerInfoScreen" class="flex-1 flex flex-col hidden overflow-hidden bg-gray-50 pb-20">
     <header class="p-4 bg-white shadow-sm flex items-center gap-3 z-10">
       <button onclick="backToTablesFromScreen('customerInfoScreen')" class="p-2 bg-gray-100 rounded-lg text-gray-600 font-bold active:bg-gray-200">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
       </button>
       <h1 class="text-xl font-bold text-gray-800"><span id="customerInfoTable"></span> - お客様情報</h1>
     </header>
@@ -145,46 +135,20 @@
         <div class="input-group">
           <label>年齢層 (複数選択可)</label>
           <div class="grid grid-cols-3 gap-2 mt-2">
-            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50">
-              <input type="checkbox" value="10代" class="cust-age-cb w-5 h-5 accent-pink-500">
-              <span class="text-sm font-bold">10代</span>
-            </label>
-            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50">
-              <input type="checkbox" value="20代" class="cust-age-cb w-5 h-5 accent-pink-500">
-              <span class="text-sm font-bold">20代</span>
-            </label>
-            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50">
-              <input type="checkbox" value="30代" class="cust-age-cb w-5 h-5 accent-pink-500">
-              <span class="text-sm font-bold">30代</span>
-            </label>
-            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50">
-              <input type="checkbox" value="40代" class="cust-age-cb w-5 h-5 accent-pink-500">
-              <span class="text-sm font-bold">40代</span>
-            </label>
-            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50">
-              <input type="checkbox" value="50代" class="cust-age-cb w-5 h-5 accent-pink-500">
-              <span class="text-sm font-bold">50代</span>
-            </label>
-            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50">
-              <input type="checkbox" value="60代以上" class="cust-age-cb w-5 h-5 accent-pink-500">
-              <span class="text-sm font-bold">60代以上</span>
-            </label>
+            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50"><input type="checkbox" value="10代" class="cust-age-cb w-5 h-5 accent-pink-500"><span class="text-sm font-bold">10代</span></label>
+            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50"><input type="checkbox" value="20代" class="cust-age-cb w-5 h-5 accent-pink-500"><span class="text-sm font-bold">20代</span></label>
+            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50"><input type="checkbox" value="30代" class="cust-age-cb w-5 h-5 accent-pink-500"><span class="text-sm font-bold">30代</span></label>
+            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50"><input type="checkbox" value="40代" class="cust-age-cb w-5 h-5 accent-pink-500"><span class="text-sm font-bold">40代</span></label>
+            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50"><input type="checkbox" value="50代" class="cust-age-cb w-5 h-5 accent-pink-500"><span class="text-sm font-bold">50代</span></label>
+            <label class="flex items-center gap-2 bg-white border border-gray-300 p-2 rounded-lg cursor-pointer active:bg-gray-50"><input type="checkbox" value="60代以上" class="cust-age-cb w-5 h-5 accent-pink-500"><span class="text-sm font-bold">60代以上</span></label>
           </div>
         </div>
         <div class="flex gap-4 mt-4">
-          <div class="input-group flex-1">
-            <label>男性 (人)</label>
-            <input type="number" id="custMale" value="0" min="0" inputmode="numeric">
-          </div>
-          <div class="input-group flex-1">
-            <label>女性 (人)</label>
-            <input type="number" id="custFemale" value="0" min="0" inputmode="numeric">
-          </div>
+          <div class="input-group flex-1"><label>男性 (人)</label><input type="number" id="custMale" value="0" min="0" inputmode="numeric"></div>
+          <div class="input-group flex-1"><label>女性 (人)</label><input type="number" id="custFemale" value="0" min="0" inputmode="numeric"></div>
         </div>
       </div>
-      <button onclick="startNewOrder()" class="w-full py-4 mt-4 bg-pink-500 text-white text-xl font-bold rounded-xl shadow-md active:bg-pink-600 transition-colors">
-        注文を開始する
-      </button>
+      <button onclick="startNewOrder()" class="w-full py-4 mt-4 bg-pink-500 text-white text-xl font-bold rounded-xl shadow-md active:bg-pink-600 transition-colors">注文を開始する</button>
     </div>
   </div>
 
@@ -192,52 +156,15 @@
   <div id="orderScreen" class="flex-1 flex flex-col hidden overflow-hidden bg-gray-50 pb-20">
     <header class="p-3 bg-white shadow-sm flex items-center gap-3 z-10">
       <button onclick="backToTablesFromScreen('orderScreen', true)" class="p-2 bg-gray-100 rounded-lg text-gray-600 font-bold active:bg-gray-200">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
       </button>
       <h1 class="text-xl font-bold text-gray-800" id="orderHeaderTitle">T1 (新規)</h1>
     </header>
-    
     <div class="flex-1 p-3 overflow-y-auto max-w-md mx-auto w-full">
-      <div id="step1" class="step-box">
-        <div class="step-header">
-          <div class="step-title">1. カテゴリーを選択</div>
-        </div>
-        <div id="categoryGrid" class="cat-grid"></div>
-      </div>
-
-      <div id="step2" class="step-box hidden">
-        <div class="step-header">
-          <div class="step-title">2. 商品と個数を選択 (<span id="selectedCatName"></span>)</div>
-        </div>
-        <div id="itemList" class="item-list"></div>
-        <button class="btn-custom" onclick="goToStep('2Custom')">＋ 手動入力（メニューにない場合）</button>
-        <button class="btn-secondary" onclick="goToStep(1)">← カテゴリー選択に戻る</button>
-      </div>
-
-      <div id="step2Custom" class="step-box hidden">
-        <div class="step-header">
-          <div class="step-title">手動入力（商品名＋金額）</div>
-        </div>
-        <div class="input-group">
-          <label>商品名</label>
-          <input type="text" id="customName" placeholder="例: 限定メニュー">
-        </div>
-        <div class="input-group">
-          <label>単価 (円)</label>
-          <input type="number" id="customPrice" placeholder="例: 800" inputmode="numeric">
-        </div>
-        <div class="input-group">
-          <label>個数</label>
-          <input type="number" id="customCount" value="1" min="1" inputmode="numeric">
-        </div>
-        <button class="btn-confirm" style="width: 100%;" onclick="addCustomItem()">リストに追加</button>
-        <button class="btn-secondary" onclick="goToStep(2)">← 商品リストに戻る</button>
-      </div>
+      <div id="step1" class="step-box"><div class="step-header"><div class="step-title">1. カテゴリーを選択</div></div><div id="categoryGrid" class="cat-grid"></div></div>
+      <div id="step2" class="step-box hidden"><div class="step-header"><div class="step-title">2. 商品と個数を選択 (<span id="selectedCatName"></span>)</div></div><div id="itemList" class="item-list"></div><button class="btn-custom" onclick="goToStep('2Custom')">＋ 手動入力（メニューにない場合）</button><button class="btn-secondary" onclick="goToStep(1)">← カテゴリー選択に戻る</button></div>
+      <div id="step2Custom" class="step-box hidden"><div class="step-header"><div class="step-title">手動入力（商品名＋金額）</div></div><div class="input-group"><label>商品名</label><input type="text" id="customName" placeholder="例: 限定メニュー"></div><div class="input-group"><label>単価 (円)</label><input type="number" id="customPrice" placeholder="例: 800" inputmode="numeric"></div><div class="input-group"><label>個数</label><input type="number" id="customCount" value="1" min="1" inputmode="numeric"></div><button class="btn-confirm" style="width: 100%;" onclick="addCustomItem()">リストに追加</button><button class="btn-secondary" onclick="goToStep(2)">← 商品リストに戻る</button></div>
     </div>
-
-    <!-- 下部固定バー -->
     <div id="bottomBar" class="bottom-bar hidden">
       <button class="btn-clear" onclick="clearCart()">クリア</button>
       <button id="confirmBtn" class="btn-confirm" onclick="openConfirmModal()">最終確認 (<span id="totalSelectedCount">0</span>件)</button>
@@ -247,26 +174,16 @@
   <!-- STEP 4: 注文履歴画面 -->
   <div id="historyScreen" class="flex-1 flex flex-col hidden overflow-hidden bg-gray-50 pb-8">
     <header class="p-4 bg-white shadow-sm flex items-center gap-3 z-10">
-      <button onclick="backToTablesFromScreen('historyScreen')" class="p-2 bg-gray-100 rounded-lg text-gray-600 font-bold active:bg-gray-200">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
+      <button onclick="backToTablesFromScreen('historyScreen')" class="p-2 bg-gray-100 rounded-lg text-gray-600 font-bold active:bg-gray-200"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
       <h1 class="text-xl font-bold text-gray-800"><span id="historyTableTitle"></span> - 注文履歴</h1>
     </header>
-    <div class="flex-1 p-4 overflow-y-auto">
-      <div id="historyList" class="flex flex-col gap-3"></div>
-    </div>
+    <div class="flex-1 p-4 overflow-y-auto"><div id="historyList" class="flex flex-col gap-3"></div></div>
   </div>
 
   <!-- STEP 5: お会計画面 -->
   <div id="checkoutScreen" class="flex-1 flex flex-col hidden overflow-hidden bg-gray-50 pb-8">
     <header class="p-4 bg-white shadow-sm flex items-center gap-3 z-10">
-      <button onclick="backToTablesFromScreen('checkoutScreen')" class="p-2 bg-gray-100 rounded-lg text-gray-600 font-bold active:bg-gray-200">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
+      <button onclick="backToTablesFromScreen('checkoutScreen')" class="p-2 bg-gray-100 rounded-lg text-gray-600 font-bold active:bg-gray-200"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
       <h1 class="text-xl font-bold text-gray-800"><span id="checkoutTableTitle"></span> - お会計</h1>
     </header>
     <div class="flex-1 p-5 overflow-y-auto flex flex-col justify-between">
@@ -275,7 +192,6 @@
           <div class="text-gray-500 font-bold mb-2">ご請求金額 (税込)</div>
           <div class="text-5xl font-black text-gray-800" id="checkoutTotal">0<span class="text-2xl font-bold ml-1">円</span></div>
         </div>
-
         <h3 class="font-bold text-gray-700 mb-3">決済方法を選択</h3>
         <div class="grid grid-cols-1 gap-3">
           <button onclick="selectPayment('現金')" id="pay-現金" class="payment-btn bg-white">現金</button>
@@ -283,57 +199,32 @@
           <button onclick="selectPayment('PayPay')" id="pay-PayPay" class="payment-btn bg-white">PayPay</button>
         </div>
       </div>
-      
-      <div class="mt-8">
-        <button id="completeCheckoutBtn" onclick="processCheckout()" disabled class="w-full py-4 bg-blue-600 text-white text-xl font-bold rounded-xl shadow-md disabled:opacity-50 disabled:bg-gray-400 transition-colors">
-          会計を完了する
-        </button>
-      </div>
+      <div class="mt-8"><button id="completeCheckoutBtn" onclick="processCheckout()" disabled class="w-full py-4 bg-blue-600 text-white text-xl font-bold rounded-xl shadow-md disabled:opacity-50 disabled:bg-gray-400 transition-colors">会計を完了する</button></div>
     </div>
   </div>
 
   <!-- アクション選択モーダル -->
   <div id="actionModal" class="modal-overlay hidden" onclick="closeActionModal(event)">
     <div class="bg-gray-100 p-6 rounded-3xl w-72 flex flex-col gap-4 shadow-2xl relative" onclick="event.stopPropagation()">
-      <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-pink-500 text-white font-black px-6 py-2 rounded-full text-xl shadow-md border-4 border-gray-100" id="modalTableTitle">
-        C1
-      </div>
+      <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-pink-500 text-white font-black px-6 py-2 rounded-full text-xl shadow-md border-4 border-gray-100" id="modalTableTitle">C1</div>
       <div class="mt-4">
-        <button id="btnNewOrder" onclick="handleAction('new')" class="w-full py-4 mb-3 bg-white text-gray-800 text-xl font-bold rounded-xl shadow-sm border border-gray-200 active:bg-gray-50 flex justify-center items-center gap-2 text-blue-600 transition-opacity">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-          新規注文
-        </button>
-        <button id="btnAddOrder" onclick="handleAction('add')" class="w-full py-4 mb-3 bg-white text-gray-800 text-xl font-bold rounded-xl shadow-sm border border-gray-200 active:bg-gray-50 flex justify-center items-center gap-2 text-purple-600 transition-opacity">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-          追加注文
-        </button>
-        <button id="btnHistory" onclick="handleAction('history')" class="w-full py-4 mb-3 bg-white text-gray-800 text-xl font-bold rounded-xl shadow-sm border border-gray-200 active:bg-gray-50 flex justify-center items-center gap-2 text-gray-600 transition-opacity">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
-          注文履歴
-        </button>
-        <button id="btnCheckout" onclick="handleAction('checkout')" class="w-full py-4 bg-white text-gray-800 text-xl font-bold rounded-xl shadow-sm border border-gray-200 active:bg-gray-50 flex justify-center items-center gap-2 text-green-600 transition-opacity">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-          お会計
-        </button>
+        <button id="btnNewOrder" onclick="handleAction('new')" class="w-full py-4 mb-3 bg-white text-gray-800 text-xl font-bold rounded-xl shadow-sm border border-gray-200 flex justify-center items-center gap-2 text-blue-600"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>新規注文</button>
+        <button id="btnAddOrder" onclick="handleAction('add')" class="w-full py-4 mb-3 bg-white text-gray-800 text-xl font-bold rounded-xl shadow-sm border border-gray-200 flex justify-center items-center gap-2 text-purple-600"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>追加注文</button>
+        <button id="btnHistory" onclick="handleAction('history')" class="w-full py-4 mb-3 bg-white text-gray-800 text-xl font-bold rounded-xl shadow-sm border border-gray-200 flex justify-center items-center gap-2 text-gray-600"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>注文履歴</button>
+        <button id="btnCheckout" onclick="handleAction('checkout')" class="w-full py-4 bg-white text-gray-800 text-xl font-bold rounded-xl shadow-sm border border-gray-200 flex justify-center items-center gap-2 text-green-600"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>お会計</button>
       </div>
     </div>
   </div>
 
-  <!-- 最終確認モーダル (注文送信前) -->
+  <!-- 最終確認モーダル -->
   <div id="confirmModal" class="modal-overlay hidden" onclick="closeConfirmModal(event)">
     <div class="modal-content relative" onclick="event.stopPropagation()">
       <div class="modal-title">送信内容の確認</div>
       <div style="font-size: 13px; color: #666; margin-bottom: 12px;">
-        卓番: <strong id="modalTableDisplay" class="text-pink-600"></strong> | 
-        種別: <strong id="modalTypeDisplay"></strong><br>
-        担当: <strong id="modalStaff"></strong>
+        卓番: <strong id="modalTableDisplay" class="text-pink-600"></strong> | 種別: <strong id="modalTypeDisplay"></strong><br>担当: <strong id="modalStaff"></strong>
       </div>
       <div id="modalItemList"></div>
-      
-      <div style="margin-top: 15px; font-weight: bold; text-align: right; font-size: 16px;">
-        追加合計: <span id="modalTotalPrice" style="color:#d9480f;">0</span> 円
-      </div>
-
+      <div style="margin-top: 15px; font-weight: bold; text-align: right; font-size: 16px;">追加合計: <span id="modalTotalPrice" style="color:#d9480f;">0</span> 円</div>
       <div style="margin-top: 20px; display: flex; gap: 10px;">
         <button class="btn-secondary" style="margin:0; width:40%;" onclick="closeConfirmModal()">戻る</button>
         <button id="sendBtn" class="btn-confirm" style="width:60%; background:#40c057;" onclick="sendData()">送信決定</button>
@@ -342,10 +233,29 @@
   </div>
 
   <script>
-    // ※ 本番用GAS URLに差し替えてください
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby1Tjc5p7Ke5k9TFY4eK-HMo9DgKX5bFmU8tUTbEbtcjBk_zlPXzF6xQV-aO7rOpQ0o/exec"; 
+    // ※ デプロイされたGAS Web App URLを入力
+    const GAS_URL = "YOUR_GAS_DEPLOY_URL_HERE"; 
+    // ※ GASのSECRET_API_KEYと同じ合い言葉を設定
+    const API_KEY = "umi2026"; 
 
-    // テーブルのデータ
+    // セキュリティ認証処理
+    function verifyPin() {
+      const pin = document.getElementById('authPinInput').value.trim();
+      if (pin === API_KEY) {
+        localStorage.setItem('handy_authenticated', 'true');
+        document.getElementById('authOverlay').classList.add('hidden');
+        document.getElementById('authErrorMsg').classList.add('hidden');
+        fetchMenu();
+      } else {
+        document.getElementById('authErrorMsg').classList.remove('hidden');
+      }
+    }
+
+    // 起動時の自動認証確認
+    if (localStorage.getItem('handy_authenticated') === 'true') {
+      document.getElementById('authOverlay').classList.add('hidden');
+    }
+
     const tables = [
       { id: "C1", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
       { id: "C2", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
@@ -360,7 +270,6 @@
     ];
 
     let menuData = {};
-
     let currentStaff = "";
     let selectedTable = null;
     let orderType = ""; 
@@ -370,17 +279,14 @@
 
     document.getElementById('loginDate').valueAsDate = new Date();
     const savedStaff = localStorage.getItem('handy_staff_name');
-    if (savedStaff) {
-      document.getElementById('loginStaff').value = savedStaff;
-    }
-    
-    // メニューデータをGASから取得
+    if (savedStaff) { document.getElementById('loginStaff').value = savedStaff; }
+
     async function fetchMenu() {
       const btn = document.querySelector('#loginScreen button');
       btn.disabled = true;
       btn.innerText = "メニュー取得中...";
       try {
-        const res = await fetch(`${GAS_URL}?action=getMenu`);
+        const res = await fetch(`${GAS_URL}?action=getMenu&apiKey=${API_KEY}`);
         const data = await res.json();
         if(data.status === "success") {
           menuData = data.menu;
@@ -389,39 +295,34 @@
           btn.innerText = "次へ";
         } else {
           alert("エラー: " + data.message);
-          btn.innerText = "取得失敗";
+          btn.innerText = "認証エラー";
         }
       } catch(e) {
-        alert("メニュー通信エラー: " + e.message);
-        btn.innerText = "通信エラー";
+        btn.disabled = false;
+        btn.innerText = "次へ";
       }
     }
-    fetchMenu();
-    
+    if (localStorage.getItem('handy_authenticated') === 'true') { fetchMenu(); }
+
     setInterval(() => {
-      if (!document.getElementById('tableScreen').classList.contains('hidden')) {
-        renderTables();
-      }
+      if (!document.getElementById('tableScreen').classList.contains('hidden')) { renderTables(); }
     }, 60000);
 
     function login() {
       const staffInput = document.getElementById('loginStaff').value.trim();
       if (!staffInput) return alert("入力者名を入力してください");
-      
       currentStaff = staffInput;
       localStorage.setItem('handy_staff_name', currentStaff);
       document.getElementById('displayStaffName').innerText = currentStaff;
-
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('tableScreen').classList.remove('hidden');
-      
       renderTables();
     }
 
     function logout() {
-      if(confirm("ログイン画面に戻りますか？")) {
-        document.getElementById('tableScreen').classList.add('hidden');
-        document.getElementById('loginScreen').classList.remove('hidden');
+      if(confirm("ログアウトしてロックしますか？")) {
+        localStorage.removeItem('handy_authenticated');
+        location.reload();
       }
     }
 
@@ -442,34 +343,22 @@
       const minutes = Math.floor(diff / 60000);
       const h = Math.floor(minutes / 60);
       const m = minutes % 60;
-      if (h > 0) return `${h}時間${m}分`;
-      return `${m}分`;
+      return h > 0 ? `${h}時間${m}分` : `${m}分`;
     }
 
     function renderTables() {
       const grid = document.getElementById('tableGrid');
       grid.innerHTML = "";
-
       tables.forEach(table => {
         const card = document.createElement('div');
-        
         if (table.isActive) {
           const timeStr = getElapsedTime(table.startTime);
           card.className = "table-card active p-4 flex flex-col justify-between cursor-pointer";
-          card.innerHTML = `
-            <div class="text-3xl font-black text-pink-600">${table.id}</div>
-            <div class="flex flex-col gap-1 mt-2">
-              <div class="text-sm font-bold text-gray-500">滞在: <span class="text-lg text-gray-800">${timeStr}</span></div>
-              <div class="text-sm font-bold text-gray-500">合計: <span class="text-2xl text-gray-800 tracking-tight">¥${table.total.toLocaleString()}</span></div>
-            </div>
-          `;
+          card.innerHTML = `<div class="text-3xl font-black text-pink-600">${table.id}</div><div class="flex flex-col gap-1 mt-2"><div class="text-sm font-bold text-gray-500">滞在: <span class="text-lg text-gray-800">${timeStr}</span></div><div class="text-sm font-bold text-gray-500">合計: <span class="text-2xl text-gray-800 tracking-tight">¥${table.total.toLocaleString()}</span></div></div>`;
         } else {
           card.className = "table-card p-4 flex items-center justify-center cursor-pointer";
-          card.innerHTML = `
-            <div class="text-5xl font-black text-gray-400 opacity-50">${table.id}</div>
-          `;
+          card.innerHTML = `<div class="text-5xl font-black text-gray-400 opacity-50">${table.id}</div>`;
         }
-
         card.onclick = () => openActionModal(table);
         grid.appendChild(card);
       });
@@ -478,7 +367,6 @@
     function openActionModal(table) {
       selectedTable = table;
       document.getElementById('modalTableTitle').innerText = table.id;
-      
       const btnNew = document.getElementById('btnNewOrder');
       const btnAdd = document.getElementById('btnAddOrder');
       const btnHistory = document.getElementById('btnHistory');
@@ -495,7 +383,6 @@
         btnHistory.classList.add('opacity-40', 'pointer-events-none');
         btnCheckout.classList.add('opacity-40', 'pointer-events-none');
       }
-
       document.getElementById('actionModal').classList.remove('hidden');
     }
 
@@ -507,22 +394,18 @@
 
     function handleAction(action) {
       document.getElementById('actionModal').classList.add('hidden');
-      
       if (action === 'new') {
         document.getElementById('tableScreen').classList.add('hidden');
         document.getElementById('customerInfoTable').innerText = selectedTable.id;
-        
         document.querySelectorAll('.cust-age-cb').forEach(cb => cb.checked = false);
         document.getElementById('custMale').value = 0;
         document.getElementById('custFemale').value = 0;
-
         document.getElementById('customerInfoScreen').classList.remove('hidden');
       } else if (action === 'add') {
         orderType = '追加';
         cart = [];
         updateTotalCount();
         document.getElementById('orderHeaderTitle').innerText = `${selectedTable.id} (追加)`;
-        
         document.getElementById('tableScreen').classList.add('hidden');
         document.getElementById('orderScreen').classList.remove('hidden');
         document.getElementById('bottomBar').classList.remove('hidden');
@@ -535,11 +418,9 @@
       } else if (action === 'checkout') {
         document.getElementById('checkoutTableTitle').innerText = selectedTable.id;
         document.getElementById('checkoutTotal').innerText = selectedTable.total.toLocaleString();
-        
         document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('selected'));
         selectedPayment = "";
         document.getElementById('completeCheckoutBtn').disabled = true;
-
         document.getElementById('tableScreen').classList.add('hidden');
         document.getElementById('checkoutScreen').classList.remove('hidden');
       }
@@ -549,27 +430,19 @@
       orderType = '新規';
       cart = [];
       updateTotalCount();
-
       const tbl = tables.find(t => t.id === selectedTable.id);
       if (tbl) {
         tbl.isActive = true;
         tbl.startTime = Date.now();
         tbl.total = 0;
         tbl.history = [];
-        
-        const maleCount = document.getElementById('custMale').value;
-        const femaleCount = document.getElementById('custFemale').value;
-        const selectedAges = Array.from(document.querySelectorAll('.cust-age-cb:checked')).map(cb => cb.value);
-        
         tbl.customerInfo = {
-          age: selectedAges,
-          male: maleCount,
-          female: femaleCount
+          age: Array.from(document.querySelectorAll('.cust-age-cb:checked')).map(cb => cb.value),
+          male: document.getElementById('custMale').value,
+          female: document.getElementById('custFemale').value
         };
       }
-
       document.getElementById('orderHeaderTitle').innerText = `${selectedTable.id} (新規)`;
-      
       document.getElementById('customerInfoScreen').classList.add('hidden');
       document.getElementById('orderScreen').classList.remove('hidden');
       document.getElementById('bottomBar').classList.remove('hidden');
@@ -589,15 +462,62 @@
         const subtotal = item.price * item.count;
         const card = document.createElement('div');
         card.className = "bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center";
+        // 履歴アイテムの右側に「取消」ボタンを追加
         card.innerHTML = `
-          <div>
+          <div class="flex-1">
             <div class="font-bold text-gray-800 text-lg">${item.name}</div>
             <div class="text-sm text-gray-500">¥${item.price.toLocaleString()} × ${item.count}</div>
           </div>
-          <div class="font-black text-xl">¥${subtotal.toLocaleString()}</div>
+          <div class="font-black text-xl mr-3">¥${subtotal.toLocaleString()}</div>
+          <button onclick="cancelHistoryItem('${item.name}')" class="px-3 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-bold active:bg-red-200 whitespace-nowrap">取消</button>
         `;
         list.appendChild(card);
       });
+    }
+
+    async function cancelHistoryItem(itemName) {
+      const tbl = tables.find(t => t.id === selectedTable.id);
+      if (!tbl) return;
+      const historyItem = tbl.history.find(h => h.name === itemName);
+      if (!historyItem) return;
+
+      if (!confirm(`${itemName} を1つキャンセルしますか？`)) return;
+
+      // GASにマイナス（キャンセル）データを送信
+      const payload = [{
+        tableNo: selectedTable.id,
+        type: 'キャンセル', 
+        staff: currentStaff,
+        category: '取消', 
+        name: itemName,
+        price: historyItem.price,
+        count: -1, // 個数をマイナスで送ることで売上から引く
+        customerInfo: tbl.customerInfo || { age: [], male: 0, female: 0 }
+      }];
+
+      try {
+        await fetch(GAS_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify(payload)
+        });
+
+        // テーブルの合計金額と履歴の個数を減らす
+        historyItem.count -= 1;
+        tbl.total -= historyItem.price;
+        
+        // 0個になったら履歴リストから完全に削除する
+        if (historyItem.count <= 0) {
+          tbl.history = tbl.history.filter(h => h.name !== itemName);
+        }
+        
+        alert(`${itemName} を1つキャンセルしました。`);
+        renderHistory(); // 履歴画面を再描画して反映
+        
+      } catch (e) {
+        alert("キャンセル通信エラー: " + e.message);
+      }
     }
 
     function selectPayment(method) {
@@ -609,17 +529,15 @@
 
     async function processCheckout() {
       if(!confirm(`${selectedPayment} でお会計を完了しますか？`)) return;
-
       const btn = document.getElementById('completeCheckoutBtn');
       btn.disabled = true;
       btn.innerText = "処理中...";
 
       try {
         const tbl = tables.find(t => t.id === selectedTable.id);
-        
-        // GASへ送信する売上データ
         const payload = {
           action: "checkout",
+          apiKey: API_KEY,
           tableNo: selectedTable.id,
           staff: currentStaff,
           totalAmount: tbl ? tbl.total : 0,
@@ -629,7 +547,6 @@
           ages: tbl && tbl.customerInfo && tbl.customerInfo.age ? tbl.customerInfo.age.join(", ") : ""
         };
 
-        // データ送信
         await fetch(GAS_URL, {
           method: "POST",
           mode: "no-cors",
@@ -678,22 +595,15 @@
     function renderItems(cat) {
       const list = document.getElementById('itemList');
       list.innerHTML = "";
+      if (!menuData[cat]) return;
 
       menuData[cat].forEach(itemObj => {
         const cartItem = cart.find(i => i.name === itemObj.name) || { count: 0 };
-        
         const card = document.createElement('div');
         card.className = `item-card ${cartItem.count > 0 ? 'has-count' : ''}`;
         card.innerHTML = `
-          <div class="item-info">
-            <div>${itemObj.name}</div>
-            <div class="item-price">${itemObj.price.toLocaleString()} 円</div>
-          </div>
-          <div class="count-controls">
-            <button class="btn-cnt" onclick="updateItemCount('${cat}', '${itemObj.name}', -1, ${itemObj.price})">-</button>
-            <span class="cnt-val" id="cnt-${itemObj.name}">${cartItem.count}</span>
-            <button class="btn-cnt" onclick="updateItemCount('${cat}', '${itemObj.name}', 1, ${itemObj.price})">+</button>
-          </div>
+          <div class="item-info"><div>${itemObj.name}</div><div class="item-price">${itemObj.price.toLocaleString()} 円</div></div>
+          <div class="count-controls"><button class="btn-cnt" onclick="updateItemCount('${cat}', '${itemObj.name}', -1, ${itemObj.price})">-</button><span class="cnt-val" id="cnt-${itemObj.name}">${cartItem.count}</span><button class="btn-cnt" onclick="updateItemCount('${cat}', '${itemObj.name}', 1, ${itemObj.price})">+</button></div>
         `;
         list.appendChild(card);
       });
@@ -706,11 +616,8 @@
         item = { category: cat, name: name, price: price, count: 0 };
         cart.push(item);
       }
-
       item.count = Math.max(0, item.count + delta);
-      if (item.count === 0) {
-        cart = cart.filter(i => i.name !== name);
-      }
+      if (item.count === 0) cart = cart.filter(i => i.name !== name);
 
       const cntEl = document.getElementById(`cnt-${name}`);
       if (cntEl) {
@@ -719,23 +626,16 @@
         if (item.count > 0) card.classList.add('has-count');
         else card.classList.remove('has-count');
       }
-
       updateTotalCount();
-
-      if (!document.getElementById('confirmModal').classList.contains('hidden')) {
-        renderModalItems();
-      }
+      if (!document.getElementById('confirmModal').classList.contains('hidden')) renderModalItems();
     }
 
     function addCustomItem() {
       const name = document.getElementById('customName').value.trim();
       const price = Number(document.getElementById('customPrice').value) || 0;
       const count = Number(document.getElementById('customCount').value) || 1;
-
       if (!name) return alert("商品名を入力してください");
-
       updateItemCount(currentCategory, name, count, price);
-      
       document.getElementById('customName').value = "";
       document.getElementById('customPrice').value = "";
       document.getElementById('customCount').value = "1";
@@ -759,20 +659,15 @@
     }
 
     function goToStep(stepNum) {
-      ['step1', 'step2', 'step2Custom'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-      });
-      const targetId = typeof stepNum === 'string' ? `step${stepNum}` : `step${stepNum}`;
-      document.getElementById(targetId).classList.remove('hidden');
+      ['step1', 'step2', 'step2Custom'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      document.getElementById(`step${stepNum}`).classList.remove('hidden');
     }
 
     function openConfirmModal() {
       if (cart.length === 0) return alert("商品が選択されていません");
-
       document.getElementById('modalTableDisplay').innerText = selectedTable.id;
       document.getElementById('modalTypeDisplay').innerText = orderType;
       document.getElementById('modalStaff').innerText = currentStaff;
-
       renderModalItems();
       document.getElementById('confirmModal').classList.remove('hidden');
     }
@@ -780,35 +675,15 @@
     function renderModalItems() {
       const listEl = document.getElementById('modalItemList');
       listEl.innerHTML = "";
-
-      if (cart.length === 0) {
-        listEl.innerHTML = `<div style="text-align:center; color:#888; padding:20px;">選択中の商品はありません</div>`;
-        document.getElementById('modalTotalPrice').innerText = "0";
-        return;
-      }
-
       let totalPrice = 0;
-
       cart.forEach(item => {
         const subtotal = item.price * item.count;
         totalPrice += subtotal;
-
         const card = document.createElement('div');
         card.className = 'modal-item-card';
-        card.innerHTML = `
-          <div class="modal-item-info">
-            <div>${item.name}</div>
-            <div style="font-size:12px; color:#666; font-weight:normal;">${item.price.toLocaleString()}円 × ${item.count} = ${subtotal.toLocaleString()}円</div>
-          </div>
-          <div class="count-controls">
-            <button class="btn-cnt" onclick="updateItemCount('${item.category}', '${item.name}', -1, ${item.price})">-</button>
-            <span class="cnt-val">${item.count}</span>
-            <button class="btn-cnt" onclick="updateItemCount('${item.category}', '${item.name}', 1, ${item.price})">+</button>
-          </div>
-        `;
+        card.innerHTML = `<div class="modal-item-info"><div>${item.name}</div><div style="font-size:12px; color:#666;">${item.price.toLocaleString()}円 × ${item.count} = ${subtotal.toLocaleString()}円</div></div><div class="count-controls"><button class="btn-cnt" onclick="updateItemCount('${item.category}', '${item.name}', -1, ${item.price})">-</button><span class="cnt-val">${item.count}</span><button class="btn-cnt" onclick="updateItemCount('${item.category}', '${item.name}', 1, ${item.price})">+</button></div>`;
         listEl.appendChild(card);
       });
-
       document.getElementById('modalTotalPrice').innerText = totalPrice.toLocaleString();
     }
 
@@ -820,10 +695,10 @@
 
     async function sendData() {
       if (cart.length === 0) return alert("商品が選択されていません");
-
       const tbl = tables.find(t => t.id === selectedTable.id);
 
       const payload = cart.map(item => ({
+        apiKey: API_KEY,
         tableNo: selectedTable.id,
         type: orderType, 
         staff: currentStaff,
@@ -849,14 +724,10 @@
         if(tbl) {
           const addedTotal = cart.reduce((sum, item) => sum + (item.price * item.count), 0);
           tbl.total = (tbl.total || 0) + addedTotal;
-          
           cart.forEach(item => {
             const existing = tbl.history.find(h => h.name === item.name);
-            if (existing) {
-              existing.count += item.count;
-            } else {
-              tbl.history.push({name: item.name, count: item.count, price: item.price});
-            }
+            if (existing) { existing.count += item.count; }
+            else { tbl.history.push({name: item.name, count: item.count, price: item.price}); }
           });
         }
         
