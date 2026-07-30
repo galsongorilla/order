@@ -97,10 +97,8 @@
         </div>
         <div>
           <label class="block text-lg font-bold text-gray-700 mb-2">入力者</label>
-          <input type="text" id="loginStaff" list="staffList" class="w-full p-3 rounded-lg border-2 border-gray-300 text-lg bg-white focus:outline-none focus:border-pink-400" placeholder="名前を入力">
-        
+          <input type="text" id="loginStaff" class="w-full p-3 rounded-lg border-2 border-gray-300 text-lg bg-white focus:outline-none focus:border-pink-400" placeholder="名前を入力">
         </div>
-        
       </div>
     </div>
     <div class="mt-4 pb-8">
@@ -301,7 +299,7 @@
           追加注文
         </button>
         <button id="btnHistory" onclick="handleAction('history')" class="w-full py-4 mb-3 bg-white text-gray-800 text-xl font-bold rounded-xl shadow-sm border border-gray-200 active:bg-gray-50 flex justify-center items-center gap-2 text-gray-600 transition-opacity">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
           注文履歴
         </button>
         <button id="btnCheckout" onclick="handleAction('checkout')" class="w-full py-4 bg-white text-gray-800 text-xl font-bold rounded-xl shadow-sm border border-gray-200 active:bg-gray-50 flex justify-center items-center gap-2 text-green-600 transition-opacity">
@@ -644,8 +642,6 @@
         alert("キャンセル処理中にエラーが発生しました: " + err.message);
       }
     }
-
-    function selectPayment(method) {
 
     function selectPayment(method) {
       selectedPayment = method;
