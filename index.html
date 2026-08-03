@@ -14,7 +14,6 @@
       -webkit-tap-highlight-color: transparent;
     }
     
-    /* テーブル画面用 */
     .table-card {
       aspect-ratio: 1 / 1;
       border-radius: 16px;
@@ -31,7 +30,6 @@
       transform: scale(0.95);
     }
     
-    /* 注文画面用 */
     .step-box { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 12px; }
     .step-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 10px; }
     .step-title { font-weight: bold; font-size: 14px; color: #666; }
@@ -63,7 +61,6 @@
     .btn-secondary { width: 100%; padding: 10px; background: transparent; color: #868e96; border: none; font-size: 14px; margin-top: 8px; cursor: pointer; }
     .btn-custom { width: 100%; padding: 10px; background: #e7f5ff; border: 1px dashed #74c0fc; color: #1971c2; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 8px; }
 
-    /* モーダル用 */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background-color: rgba(0, 0, 0, 0.5);
@@ -75,7 +72,6 @@
     .modal-item-card { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #eee; }
     .modal-item-info { flex: 1; font-size: 14px; font-weight: bold; }
 
-    /* 決済ボタン */
     .payment-btn { padding: 16px; border-radius: 12px; border: 2px solid #ddd; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
     .payment-btn.selected { border-color: #3b82f6; background-color: #eff6ff; color: #1d4ed8; }
 
@@ -310,6 +306,28 @@
     </div>
   </div>
 
+  <!-- アイス味選択モーダル -->
+  <div id="iceModal" class="modal-overlay hidden" onclick="closeIceModal(event)">
+    <div class="modal-content relative" onclick="event.stopPropagation()">
+      <div class="modal-title" id="iceModalTitle">味を選択</div>
+      <div class="text-sm text-gray-600 mb-3" id="iceModalDesc"></div>
+      
+      <div class="grid grid-cols-2 gap-2" id="iceFlavorList">
+        <!-- Javascriptで味ボタンを生成 -->
+      </div>
+      
+      <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+        <div class="text-sm font-bold text-gray-700 mb-1">選択中の味:</div>
+        <div id="iceSelectedFlavors" class="text-pink-600 font-bold min-h-[24px]"></div>
+      </div>
+      
+      <div class="flex gap-2 mt-4">
+        <button class="btn-secondary flex-1 m-0" onclick="closeIceModal()">キャンセル</button>
+        <button id="iceConfirmBtn" class="btn-confirm flex-1 disabled:opacity-50" disabled onclick="confirmIceSelection()">カートに追加</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 最終確認モーダル (注文送信前) -->
   <div id="confirmModal" class="modal-overlay hidden" onclick="closeConfirmModal(event)">
     <div class="modal-content relative" onclick="event.stopPropagation()">
@@ -334,9 +352,9 @@
 
   <script>
     // ※ 本番用GAS URLに差し替えてください
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbz9IouiOuRthfPxRQPHgtoeGjERTHe6uKuFBIYeSmBCPODvzTiuzmEbUL7UZw05V8Di/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbx3-SFg9cyCNXmSQ7K0VB75Kl2nCH423R6oye-rmWIMrnmVzhEF9e64WWaYCT9JlHyg/exec"; 
 
-    // テーブルのデータ
+    // テーブルのデータ (TakeOut含む)
     const tables = [
       { id: "C1", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
       { id: "C2", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
@@ -348,16 +366,23 @@
       { id: "T6", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
       { id: "T7", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
       { id: "T8", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
+      { id: "TakeOut", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
     ];
 
     let menuData = {};
-
     let currentStaff = "";
     let selectedTable = null;
     let orderType = ""; 
     let currentCategory = "";
     let cart = []; 
+    
     let selectedPayment = "";
+    let checkoutTotalAmount = 0; // 10%上乗せ計算用
+
+    // アイス味選択用変数
+    const iceFlavors = ['バニラ', 'チョコレート', 'ストロベリー', 'ブルーウェーブ', '塩ちんすこう', 'マンゴー', '紅芋'];
+    let pendingIceItem = null;
+    let selectedIceFlavors = [];
 
     document.getElementById('loginDate').valueAsDate = new Date();
     const savedStaff = localStorage.getItem('handy_staff_name');
@@ -365,17 +390,56 @@
       document.getElementById('loginStaff').value = savedStaff;
     }
     
+    // ★追加・復活：サーバーから最新の卓状況を取得する関数
+    async function fetchTables() {
+      try {
+        const res = await fetch(`${GAS_URL.trim()}?action=getTables`);
+        const serverTables = await res.json();
+        if (serverTables && serverTables.length > 0) {
+          serverTables.forEach(st => {
+            const localT = tables.find(t => t.id === st.id);
+            if (localT) {
+              Object.assign(localT, st);
+            }
+          });
+          // 画面がテーブル一覧なら再描画
+          if (!document.getElementById('tableScreen').classList.contains('hidden')) {
+            renderTables();
+          }
+        }
+      } catch(e) {
+        console.error("卓データの同期に失敗しました", e);
+      }
+    }
+
+    // ★追加・復活：変更があった卓の情報をサーバーに送信する関数
+    function syncTableState(tableData) {
+      fetch(GAS_URL.trim(), {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ action: "updateTable", tableData: tableData })
+      }).catch(e => console.error(e));
+    }
+
     // メニューデータをGASから取得
     async function fetchMenu() {
       const btn = document.querySelector('#loginScreen button');
       btn.disabled = true;
       btn.innerText = "メニュー取得中...";
       try {
-        const res = await fetch(`${GAS_URL}?action=getMenu`);
+        const res = await fetch(`${GAS_URL.trim()}?action=getMenu`);
         const data = await res.json();
         if(data.status === "success") {
           menuData = data.menu;
           renderCategories();
+          
+          // ★メニュー取得後に卓状態も初回取得する
+          await fetchTables();
+
+          // ★通信の衝突を防ぐため、メニュー取得が成功してから10秒ループを開始
+          setInterval(fetchTables, 10000);
+
           btn.disabled = false;
           btn.innerText = "次へ";
         } else {
@@ -389,12 +453,6 @@
     }
     fetchMenu();
     
-    setInterval(() => {
-      if (!document.getElementById('tableScreen').classList.contains('hidden')) {
-        renderTables();
-      }
-    }, 60000);
-
     function login() {
       const staffInput = document.getElementById('loginStaff').value.trim();
       if (!staffInput) return alert("入力者名を入力してください");
@@ -443,12 +501,15 @@
 
       tables.forEach(table => {
         const card = document.createElement('div');
+        // TakeOut など文字数が多い場合は自動で小さくする
+        const fontSize = table.id.length > 3 ? 'text-2xl' : 'text-3xl';
+        const emptyFontSize = table.id.length > 3 ? 'text-4xl' : 'text-5xl';
         
         if (table.isActive) {
           const timeStr = getElapsedTime(table.startTime);
           card.className = "table-card active p-4 flex flex-col justify-between cursor-pointer";
           card.innerHTML = `
-            <div class="text-3xl font-black text-pink-600">${table.id}</div>
+            <div class="${fontSize} font-black text-pink-600">${table.id}</div>
             <div class="flex flex-col gap-1 mt-2">
               <div class="text-sm font-bold text-gray-500">滞在: <span class="text-lg text-gray-800">${timeStr}</span></div>
               <div class="text-sm font-bold text-gray-500">合計: <span class="text-2xl text-gray-800 tracking-tight">¥${table.total.toLocaleString()}</span></div>
@@ -457,7 +518,7 @@
         } else {
           card.className = "table-card p-4 flex items-center justify-center cursor-pointer";
           card.innerHTML = `
-            <div class="text-5xl font-black text-gray-400 opacity-50">${table.id}</div>
+            <div class="${emptyFontSize} font-black text-gray-400 opacity-50">${table.id}</div>
           `;
         }
 
@@ -525,7 +586,10 @@
         document.getElementById('historyScreen').classList.remove('hidden');
       } else if (action === 'checkout') {
         document.getElementById('checkoutTableTitle').innerText = selectedTable.id;
-        document.getElementById('checkoutTotal').innerText = selectedTable.total.toLocaleString();
+        
+        // 金額のリセットと選択解除
+        checkoutTotalAmount = selectedTable.total;
+        document.getElementById('checkoutTotal').innerHTML = `${checkoutTotalAmount.toLocaleString()}<span class="text-2xl font-bold ml-1">円</span>`;
         
         document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('selected'));
         selectedPayment = "";
@@ -557,6 +621,9 @@
           male: maleCount,
           female: femaleCount
         };
+        
+        // ★状態をサーバーに同期
+        syncTableState(tbl);
       }
 
       document.getElementById('orderHeaderTitle').innerText = `${selectedTable.id} (新規)`;
@@ -607,7 +674,6 @@
 
       const item = tbl.history[itemIndex];
 
-      // GASへ送信するペイロード (個数をマイナスで送信)
       const payload = [{
         tableNo: tbl.id,
         type: "キャンセル", 
@@ -615,7 +681,7 @@
         category: item.category || "その他",
         name: item.name,
         price: item.price,
-        count: -1, // マイナス1で送信
+        count: -1, 
         customerInfo: tbl.customerInfo ? tbl.customerInfo : { age: [], male: 0, female: 0 }
       }];
 
@@ -630,8 +696,11 @@
         
         renderHistory();
 
+        // ★状態をサーバーに同期
+        syncTableState(tbl);
+
         // バックグラウンドでGASへ送信
-        await fetch(GAS_URL, {
+        await fetch(GAS_URL.trim(), {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "text/plain" },
@@ -643,11 +712,26 @@
       }
     }
 
+    // --- 決済処理 (10%加算ロジック実装済み) ---
     function selectPayment(method) {
       selectedPayment = method;
       document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('selected'));
       document.getElementById(`pay-${method}`).classList.add('selected');
       document.getElementById('completeCheckoutBtn').disabled = false;
+
+      const tbl = tables.find(t => t.id === selectedTable.id);
+      const baseTotal = tbl ? tbl.total : 0;
+      const totalDisplay = document.getElementById('checkoutTotal');
+
+      if (method === '現金') {
+        checkoutTotalAmount = baseTotal;
+        totalDisplay.innerHTML = `${checkoutTotalAmount.toLocaleString()}<span class="text-2xl font-bold ml-1">円</span>`;
+      } else {
+        // 現金以外は10%増し（端数切り捨て）
+        checkoutTotalAmount = Math.floor(baseTotal * 1.1);
+        totalDisplay.innerHTML = `${checkoutTotalAmount.toLocaleString()}<span class="text-2xl font-bold ml-1">円</span>
+                                  <div class="text-sm text-red-500 mt-2 font-bold tracking-wider">※現金以外10%加算</div>`;
+      }
     }
 
     async function processCheckout() {
@@ -660,12 +744,11 @@
       try {
         const tbl = tables.find(t => t.id === selectedTable.id);
         
-        // GASへ送信する売上データ
         const payload = {
           action: "checkout",
           tableNo: selectedTable.id,
           staff: currentStaff,
-          totalAmount: tbl ? tbl.total : 0,
+          totalAmount: checkoutTotalAmount, // 上乗せ計算後の金額を送信！
           paymentMethod: selectedPayment,
           maleCount: tbl && tbl.customerInfo ? tbl.customerInfo.male : 0,
           femaleCount: tbl && tbl.customerInfo ? tbl.customerInfo.female : 0,
@@ -673,7 +756,7 @@
         };
 
         // データ送信
-        await fetch(GAS_URL, {
+        await fetch(GAS_URL.trim(), {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "text/plain" },
@@ -686,6 +769,9 @@
           tbl.total = 0;
           tbl.history = [];
           tbl.customerInfo = { age: [], male: 0, female: 0 };
+          
+          // ★状態をサーバーに同期
+          syncTableState(tbl);
         }
 
         alert("お会計が完了しました！");
@@ -699,6 +785,7 @@
       }
     }
 
+    // --- メニュー選択 ---
     function renderCategories() {
       const grid = document.getElementById('categoryGrid');
       grid.innerHTML = "";
@@ -727,22 +814,119 @@
         
         const card = document.createElement('div');
         card.className = `item-card ${cartItem.count > 0 ? 'has-count' : ''}`;
+        
+        // アイスなど味を選ばせる商品は、元のリストアイテムに直接「＋」させて味を選ばせる
+        // ティー・コーヒーなどの飲料やシャンパンは除外
+        const isIceCream = itemObj.name.includes('アイス') && !itemObj.name.includes('（') && !/ティー|コーヒー|ラテ|オレ|モカ|ココア|チャイ|モエ|シャンドン|ラベル|アンペリアル/.test(itemObj.name);
+
         card.innerHTML = `
           <div class="item-info">
             <div>${itemObj.name}</div>
             <div class="item-price">${itemObj.price.toLocaleString()} 円</div>
           </div>
           <div class="count-controls">
-            <button class="btn-cnt" onclick="updateItemCount('${cat}', '${itemObj.name}', -1, ${itemObj.price})">-</button>
-            <span class="cnt-val" id="cnt-${itemObj.name}">${cartItem.count}</span>
-            <button class="btn-cnt" onclick="updateItemCount('${cat}', '${itemObj.name}', 1, ${itemObj.price})">+</button>
+            ${isIceCream 
+              ? `<button class="btn-cnt opacity-30 cursor-not-allowed" disabled>-</button>
+                 <span class="cnt-val text-gray-300">-</span>
+                 <button class="btn-cnt bg-pink-100 border-pink-300 text-pink-600" onclick="updateItemCount('${cat}', '${itemObj.name}', 1, ${itemObj.price})">+</button>`
+              : `<button class="btn-cnt" onclick="updateItemCount('${cat}', '${itemObj.name}', -1, ${itemObj.price})">-</button>
+                 <span class="cnt-val" id="cnt-${itemObj.name}">${cartItem.count}</span>
+                 <button class="btn-cnt" onclick="updateItemCount('${cat}', '${itemObj.name}', 1, ${itemObj.price})">+</button>`
+            }
           </div>
         `;
         list.appendChild(card);
       });
     }
 
+    // --- アイス味選択機能 ---
+    function openIceModal(cat, name, price, reqCount) {
+      pendingIceItem = { cat, name, price, reqCount };
+      selectedIceFlavors = [];
+      
+      document.getElementById('iceModalTitle').innerText = `${name} の味を選択`;
+      document.getElementById('iceModalDesc').innerText = `${reqCount}種類選んでください（同じ味もOK）`;
+      
+      const container = document.getElementById('iceFlavorList');
+      container.innerHTML = "";
+      iceFlavors.forEach(flavor => {
+        const btn = document.createElement('button');
+        btn.className = 'py-3 px-1 bg-white border border-gray-300 rounded-lg text-sm font-bold active:bg-pink-100 shadow-sm';
+        btn.innerText = flavor;
+        btn.onclick = () => selectIceFlavor(flavor);
+        container.appendChild(btn);
+      });
+      
+      updateIceModalState();
+      document.getElementById('iceModal').classList.remove('hidden');
+    }
+
+    function selectIceFlavor(flavor) {
+      if (selectedIceFlavors.length < pendingIceItem.reqCount) {
+        selectedIceFlavors.push(flavor);
+        updateIceModalState();
+      }
+    }
+
+    function removeIceFlavor(index) {
+      selectedIceFlavors.splice(index, 1);
+      updateIceModalState();
+    }
+
+    function updateIceModalState() {
+      const container = document.getElementById('iceSelectedFlavors');
+      container.innerHTML = "";
+      
+      selectedIceFlavors.forEach((f, i) => {
+        const span = document.createElement('span');
+        span.className = 'inline-block bg-pink-100 border border-pink-200 text-pink-700 px-3 py-1 rounded text-sm mr-2 mb-2 cursor-pointer active:bg-pink-200 shadow-sm';
+        span.innerHTML = `${f} <span class="text-xs ml-1 font-black">✕</span>`;
+        span.onclick = () => removeIceFlavor(i);
+        container.appendChild(span);
+      });
+      
+      const btn = document.getElementById('iceConfirmBtn');
+      if (selectedIceFlavors.length === pendingIceItem.reqCount) {
+        btn.disabled = false;
+        btn.classList.add('bg-pink-500');
+        btn.classList.remove('bg-gray-400');
+      } else {
+        btn.disabled = true;
+        btn.classList.remove('bg-pink-500');
+        btn.classList.add('bg-gray-400');
+      }
+    }
+
+    function confirmIceSelection() {
+      const flavorStr = selectedIceFlavors.join('・');
+      const finalName = `${pendingIceItem.name}（${flavorStr}）`;
+      
+      // カートへ追加
+      addToCartInternal(pendingIceItem.cat, finalName, 1, pendingIceItem.price);
+      closeIceModal();
+    }
+
+    function closeIceModal(e) {
+      if (!e || (e.target && e.target.id === 'iceModal')) {
+        document.getElementById('iceModal').classList.add('hidden');
+      }
+    }
+
+    // --- カートの増減ロジック ---
     function updateItemCount(cat, name, delta, price = 0) {
+      // アイスの「＋」が押された時（味選択未確定の場合）はモーダルを開く
+      if (delta > 0 && name.includes('アイス') && !name.includes('（') && !/ティー|コーヒー|ラテ|オレ|モカ|ココア|チャイ|モエ|シャンドン|ラベル|アンペリアル/.test(name)) {
+        let reqCount = 1;
+        if (name.includes('ダブル')) reqCount = 2;
+        if (name.includes('トリプル')) reqCount = 3;
+        openIceModal(cat, name, price, reqCount);
+        return;
+      }
+      
+      addToCartInternal(cat, name, delta, price);
+    }
+
+    function addToCartInternal(cat, name, delta, price) {
       let item = cart.find(i => i.name === name);
       if (!item) {
         if (delta <= 0) return;
@@ -882,7 +1066,7 @@
       btn.innerText = "送信中...";
 
       try {
-        await fetch(GAS_URL, {
+        await fetch(GAS_URL.trim(), {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "text/plain" },
@@ -898,10 +1082,12 @@
             if (existing) {
               existing.count += item.count;
             } else {
-              // キャンセル送信用にcategoryも履歴に保存しておく
               tbl.history.push({name: item.name, count: item.count, price: item.price, category: item.category});
             }
           });
+          
+          // ★状態をサーバーに同期
+          syncTableState(tbl);
         }
         
         alert("送信完了しました！");
